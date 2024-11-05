@@ -4,13 +4,29 @@
  */
 package kelas;
 
-/**
- *
- * @author coldp
- */
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+import kelas.koneksi;
+
 public class category {
+
     int category_id;
     String category_name;
+
+    private Connection konek;
+    private PreparedStatement ps;
+    private Statement st;
+    private ResultSet rs;
+    private String query;
+
+    public category() throws SQLException {
+        koneksi koneksi = new koneksi();
+        konek = koneksi.konekDB();
+    }
 
     public int getCategory_id() {
         return category_id;
@@ -26,6 +42,114 @@ public class category {
 
     public void setCategory_name(String category_name) {
         this.category_name = category_name;
+    }
+
+    public void tambahCategory() {
+        //  query = "INSERT INTO category VALUES(?,?)";
+        query = "INSERT INTO category (category_name) VALUES (?)";
+
+        try {
+
+            ps = konek.prepareStatement(query);
+
+            // ps.setInt(1, category_id);
+            //ps.setString(2, category_name);
+            ps.setString(1, category_name);
+
+            ps.executeUpdate();
+            ps.close();
+            JOptionPane.showMessageDialog(null, "Category Berhasil Ditambahkan");
+
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "Category Gagal Ditambahkan");
+        }
+
+    }
+
+    public ResultSet tampilCategory() {
+        query = "SELECT * FROM category";
+        try {
+            st = konek.createStatement();
+            rs = st.executeQuery(query);
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "Category Gagal Ditampilkan");
+        }
+
+        return rs;
+    }
+
+    public void hapusCategory() {
+        query = "DELETE FROM category WHERE category_id = ?";
+        try {
+
+            ps = konek.prepareStatement(query);
+
+            ps.setInt(1, category_id);
+
+            ps.executeUpdate();
+            ps.close();
+            JOptionPane.showMessageDialog(null, "Category Berhasil Di Hapus");
+
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "Category Gagal Di Hapus");
+        }
+    }
+
+    public void ubahCategory() {
+
+        query = "UPDATE category SET category_name = ? "
+                + " WHERE category_id = ?";
+        try {
+
+            ps = konek.prepareStatement(query);
+
+            ps.setString(1, category_name);
+            ps.setInt(2, category_id);
+
+            ps.executeUpdate();
+            ps.close();
+            JOptionPane.showMessageDialog(null, "Category Berhasil Di Ubah");
+
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "Category Gagal Di Ubah");
+        }
+
+    }
+
+    public ResultSet tampilComBox(){
+       query = "SELECT category_name FROM category";
+        try {
+            st = konek.createStatement();            
+            rs = st.executeQuery(query);
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "Data Gagal Tampil");
+        }
+        return rs;
+    }
+    
+    public ResultSet Konversi() {
+    query = "SELECT category_id FROM category WHERE category_name = ?";
+    try {
+        ps = konek.prepareStatement(query);
+        ps.setString(1, category_name);
+
+        rs = ps.executeQuery(); 
+        System.out.println("data masuk");
+    } catch (SQLException sQLException) {
+        System.out.println("data tak masuk");
+    }
+    return rs;
+}
+
+    public ResultSet autoID(){
+       query = "SELECT category_id AS ID FROM category ORDER BY category_id DESC LIMIT 1";
+        try {
+            st = konek.createStatement();            
+            rs = st.executeQuery(query);
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "Data Gagal Tampil");
+        }
+        return rs;
     }
     
 }
